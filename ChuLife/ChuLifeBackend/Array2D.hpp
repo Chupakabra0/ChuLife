@@ -87,11 +87,11 @@ public:
 	}
 
 	const_reference Element(size_type i, size_type j) const {
-		return this->data_[i * (this->rowsCount_ + 1) + j];
+		return this->data_[i * this->colsCount_ + j];
 	}
 
 	reference Element(size_type i, size_type j) {
-		return this->data_[i * (this->rowsCount_ + 1) + j];
+		return this->data_[i * this->colsCount_ + j];
 	}
 
 	size_type TotalCount() const {
