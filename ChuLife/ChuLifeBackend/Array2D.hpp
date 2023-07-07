@@ -58,12 +58,16 @@ public:
 		for (const auto& el : copy.data_) {
 			*iter++ = el;
 		}
+
+		return *this;
 	}
 
 	Array2D& operator=(Array2D&& move) noexcept {
 		std::swap(move.rowsCount_, this->rowsCount_);
 		std::swap(move.colsCount_, this->colsCount_);
 		std::swap(move.data_, this->data_);
+
+		return *this;
 	}
 
 	friend std::ostream& operator<<(std::ostream& out, const Array2D& arr) {
@@ -108,6 +112,10 @@ public:
 
 	void Clear() {
 		this->data_.clear();
+	}
+
+	std::vector<value_type>& RawVector() {
+		return this->data_;
 	}
 
 private:

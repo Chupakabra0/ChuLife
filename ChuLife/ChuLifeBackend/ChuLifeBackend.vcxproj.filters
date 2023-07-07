@@ -35,5 +35,8 @@
     <ClInclude Include="Consts.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ILifeRule.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
