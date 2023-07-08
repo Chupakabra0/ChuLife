@@ -27,14 +27,33 @@ int main() {
 
 	const size_t lifeLimit = 3u;
 	const size_t deadLimit = 1u;
-	std::unique_ptr<ILifeRule> gameRule(new BasicRule(lifeLimit, deadLimit));
-	std::unique_ptr<IRenderGame> renderGame(new ConsoleRenderGame(std::cout));
 
-	for (int i = 0; i < 10; ++i) {
-		std::cout << i + 1 << " iteration\n";
+	auto* renderer =
+		new OpenGLRenderer(
+			MVPMatrices(
+				glm::identity<glm::mat4>(),
+				glm::identity<glm::mat4>(),
+				glm::identity<glm::mat4>()
+			)
+		);
+	auto* window = new OpenGLWindow(400, 400, "Test");
+
+	std::unique_ptr<ILifeRule> gameRule(new BasicRule(lifeLimit, deadLimit));
+	std::unique_ptr<IRenderGame> renderGame(new OpenGLRenderGame(window, renderer));
+
+	while (!glfwWindowShouldClose(window->GetUniqueHandle().get())) {
 		renderGame->RenderGame(gameField);
-		gameField.NextField(gameRule.get());
+		glfwSwapBuffers(window->GetUniqueHandle().get());
+		glfwWaitEvents();
 	}
+
+	//std::unique_ptr<IRenderGame> renderGame(new ConsoleRenderGame(std::cout));
+
+	//for (int i = 0; i < 10; ++i) {
+	//	std::cout << i + 1 << " iteration\n";
+	//	renderGame->RenderGame(gameField);
+	//	gameField.NextField(gameRule.get());
+	//}
 
 	return EXIT_SUCCESS;
 }

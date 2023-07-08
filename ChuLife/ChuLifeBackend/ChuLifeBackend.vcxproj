@@ -88,7 +88,7 @@
   <ItemGroup>
     <ClCompile Include="BasicRule.cpp" />
     <ClCompile Include="GameField.cpp" />
-    <ClCompile Include="glad.cpp" />
+    <ClCompile Include="Glad.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="RandomFillStrategy.cpp" />
   </ItemGroup>
@@ -98,11 +98,11 @@
     <ClInclude Include="ConsoleRenderGame.hpp" />
     <ClInclude Include="Consts.hpp" />
     <ClInclude Include="GameField.hpp" />
-    <ClInclude Include="glad.hpp" />
+    <ClInclude Include="Glad.hpp" />
     <ClInclude Include="IFillStrategy.hpp" />
     <ClInclude Include="ILifeRule.hpp" />
     <ClInclude Include="IRenderGame.hpp" />
-    <ClInclude Include="khrplatform.hpp" />
+    <ClInclude Include="Khrplatform.hpp" />
     <ClInclude Include="OpenGLRenderGame.hpp" />
     <ClInclude Include="RandomFillStrategy.hpp" />
     <ClInclude Include="Utils.hpp" />

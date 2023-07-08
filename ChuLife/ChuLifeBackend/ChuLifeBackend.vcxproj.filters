@@ -27,7 +27,7 @@
     <ClCompile Include="BasicRule.cpp">
       <Filter>Resources Files</Filter>
     </ClCompile>
-    <ClCompile Include="glad.cpp">
+    <ClCompile Include="Glad.cpp">
       <Filter>Header Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -65,10 +65,10 @@
     <ClInclude Include="OpenGLRenderGame.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="glad.hpp">
+    <ClInclude Include="Glad.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="khrplatform.hpp">
+    <ClInclude Include="Khrplatform.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
