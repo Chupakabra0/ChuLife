@@ -50,6 +50,11 @@ public:
 
 	explicit GameField(size_t rowsCount, size_t colsCount, IFillStrategy* fillStrategy);
 
+	explicit GameField(const Array2D<char>& field)
+		: fillStrategy_(nullptr), field_(field) {
+
+	}
+
 	~GameField() = default;
 
 	Array2D<char> GetArray() const {

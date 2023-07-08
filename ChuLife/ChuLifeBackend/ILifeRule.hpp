@@ -33,7 +33,7 @@ public:
 		char second = rowNum - 1 < 0 ?
 			ERR_CELL :
 			array.Element(static_cast<size_t>(rowNum - 1), static_cast<size_t>(colNum));
-		char third = rowNum - 1 < 0 || colNum + 1 > array.ColsCount() ?
+		char third = rowNum - 1 < 0 || colNum + 1 >= array.ColsCount() ?
 			ERR_CELL :
 			array.Element(static_cast<size_t>(rowNum - 1), static_cast<size_t>(colNum + 1));
 		char fourth = colNum - 1 < 0 ?
@@ -48,26 +48,28 @@ public:
 		char seventh = rowNum + 1 >= array.RowsCount() ?
 			ERR_CELL :
 			array.Element(static_cast<size_t>(rowNum + 1), static_cast<size_t>(colNum));
-		char eighth = rowNum + 1 >= array.RowsCount() || colNum + 1 >= array.RowsCount() ?
+		char eighth = rowNum + 1 >= array.RowsCount() || colNum + 1 >= array.ColsCount() ?
 			ERR_CELL :
 			array.Element(static_cast<size_t>(rowNum + 1), static_cast<size_t>(colNum + 1));
 
+		const size_t lifeCount =
+			static_cast<size_t>(first == LIFE_CELL) +
+			static_cast<size_t>(second == LIFE_CELL) +
+			static_cast<size_t>(third == LIFE_CELL) +
+			static_cast<size_t>(fourth == LIFE_CELL) +
+			static_cast<size_t>(fifth == LIFE_CELL) + static_cast<size_t>(sixth == LIFE_CELL) +
+			static_cast<size_t>(seventh == LIFE_CELL) + static_cast<size_t>(eighth == LIFE_CELL);
+
 		switch (array.Element(rowNum, colNum)) {
 			case DEAD_CELL: {
-				if (static_cast<size_t>(first == LIFE_CELL) + static_cast<size_t>(second == LIFE_CELL) +
-					static_cast<size_t>(third == LIFE_CELL) + static_cast<size_t>(fourth == LIFE_CELL) +
-					static_cast<size_t>(fifth == LIFE_CELL) + static_cast<size_t>(sixth == LIFE_CELL) +
-					static_cast<size_t>(seventh == LIFE_CELL) + static_cast<size_t>(eighth == LIFE_CELL) > this->lifeLimit_) {
+				if (lifeCount >= this->lifeLimit_) {
 					return LIFE_CELL;
 				}
 
 				return DEAD_CELL;
 			}
 			case LIFE_CELL: {
-				if (static_cast<size_t>(first == DEAD_CELL) + static_cast<size_t>(second == DEAD_CELL) +
-					static_cast<size_t>(third == DEAD_CELL) + static_cast<size_t>(fourth == DEAD_CELL) +
-					static_cast<size_t>(fifth == DEAD_CELL) + static_cast<size_t>(sixth == DEAD_CELL) +
-					static_cast<size_t>(seventh == DEAD_CELL) + static_cast<size_t>(eighth == DEAD_CELL) > this->deadLimit_) {
+				if (lifeCount <= this->deadLimit_) {
 					return DEAD_CELL;
 				}
 
