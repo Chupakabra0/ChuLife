@@ -1,50 +1,71 @@
 #include <iostream>
 #include <memory>
+#include <thread>
+#include <chrono>
 
 #include "GameField.hpp"
+#include "RandomFillStrategy.hpp"
 #include "BasicRule.hpp"
 #include "ConsoleRenderGame.hpp"
 #include "OpenGLRenderGame.hpp"
 
 int main() {
-	GameField gameField(Array2D<char>{
-		std::initializer_list{
-			DEAD_CELL, DEAD_CELL, DEAD_CELL, DEAD_CELL
-		},
-		{
-			DEAD_CELL, LIFE_CELL, DEAD_CELL, DEAD_CELL
-		},
-		{
-			DEAD_CELL, LIFE_CELL, DEAD_CELL, DEAD_CELL
-		},
-		{
-			DEAD_CELL, LIFE_CELL, DEAD_CELL, DEAD_CELL
-		},
-		{
-			DEAD_CELL, DEAD_CELL, DEAD_CELL, DEAD_CELL
-		}
-	});
+	//GameField gameField(Array2D<char>{
+	//	std::initializer_list{
+	//		DEAD_CELL, DEAD_CELL, DEAD_CELL, DEAD_CELL, DEAD_CELL
+	//	},
+	//	{
+	//		DEAD_CELL, LIFE_CELL, DEAD_CELL, LIFE_CELL, DEAD_CELL
+	//	},
+	//	{
+	//		DEAD_CELL, LIFE_CELL, DEAD_CELL, DEAD_CELL, DEAD_CELL
+	//	},
+	//	{
+	//		DEAD_CELL, LIFE_CELL, DEAD_CELL, LIFE_CELL, DEAD_CELL
+	//	},
+	//	{
+	//		DEAD_CELL, DEAD_CELL, DEAD_CELL, DEAD_CELL, DEAD_CELL
+	//	}
+	//});
+	GameField gameField(72, 128, new RandomFillStrategy());
 
-	const size_t lifeLimit = 3u;
-	const size_t deadLimit = 1u;
+	const size_t lifeLimit = 5u;
+	const size_t deadLimit = 3u;
+	const int windowHeight = 1080;
+	const int windowWidth  = 1920;
 
-	auto* renderer =
-		new OpenGLRenderer(
-			MVPMatrices(
-				glm::identity<glm::mat4>(),
-				glm::identity<glm::mat4>(),
-				glm::identity<glm::mat4>()
-			)
-		);
-	auto* window = new OpenGLWindow(400, 400, "Test");
+	auto* renderer = new OpenGLRenderer();
+	auto* window   = new OpenGLWindow(windowWidth, windowHeight, "Test");
+
+	renderer->SetViewMatrix(
+		glm::mat4(
+			2.0f / windowWidth, 0.0f, 0.0f, 0.0f,
+			0.0f, -2.0f / windowHeight, 0.0f, 0.0f,
+			0.0f, 0.0f, 1.0f, 0.0f,
+			-1.0f, 1.0f, 0.0f, 1.0f
+		)
+	);
 
 	std::unique_ptr<ILifeRule> gameRule(new BasicRule(lifeLimit, deadLimit));
 	std::unique_ptr<IRenderGame> renderGame(new OpenGLRenderGame(window, renderer));
 
+	const std::time_t milisecondsLimit = 100ll;
+	auto begin                         = std::chrono::system_clock::now();
+	auto end                           = std::chrono::system_clock::now();
+
 	while (!glfwWindowShouldClose(window->GetUniqueHandle().get())) {
-		renderGame->RenderGame(gameField);
-		glfwSwapBuffers(window->GetUniqueHandle().get());
-		glfwWaitEvents();
+		end = std::chrono::system_clock::now();
+
+		if (std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() > milisecondsLimit) {
+			renderGame->RenderGame(gameField);
+			gameField.NextField(gameRule.get());
+
+			glfwSwapBuffers(window->GetUniqueHandle().get());
+
+			begin = std::chrono::system_clock::now();
+		}
+
+		glfwPollEvents();
 	}
 
 	//std::unique_ptr<IRenderGame> renderGame(new ConsoleRenderGame(std::cout));

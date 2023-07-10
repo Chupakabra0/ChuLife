@@ -200,11 +200,16 @@ private:
 
 class OpenGLRenderer {
 public:
-	OpenGLRenderer() = delete;
-
-	explicit OpenGLRenderer(const MVPMatrices& mvp)
-		: mvp_(mvp) {
+	explicit OpenGLRenderer()
+		: mvp_(MVPMatrices{
+		    .modelMatrix      = glm::identity<glm::mat4>(),
+			.viewMatrix       = glm::identity<glm::mat4>(),
+			.projectionMatrix = glm::identity<glm::mat4>(),
+		}) {
 		this->glfwInit_();
+		//this->SetModelMatrix(mvp.modelMatrix);
+		//this->SetProjectionMatrix(mvp.projectionMatrix);
+		//this->SetViewMatrix(mvp.viewMatrix);
 	}
 
 	~OpenGLRenderer() {
@@ -266,6 +271,24 @@ public:
 		glEnd();
 	}
 
+	void RenderTriangles(const std::vector<Vertex>& vertices) {
+		glBegin(GL_TRIANGLES);
+		{
+			for (const Vertex& v : vertices) {
+				const Vertex curr = Vertex(
+					this->mvp_.modelMatrix * v.GetPosition(),
+					v.GetNormal(),
+					v.GetColor()
+				);
+
+				glNormal3f(curr.GetNormal().x, curr.GetNormal().y, curr.GetNormal().z);
+				glColor4f(curr.GetColor().r, curr.GetColor().g, curr.GetColor().b, curr.GetColor().a);
+				glVertex4f(curr.GetPosition().x, curr.GetPosition().y, curr.GetPosition().z, curr.GetPosition().w);
+			}
+		}
+		glEnd();
+	}
+
 private:
 	MVPMatrices mvp_;
 
@@ -292,18 +315,136 @@ public:
 	~OpenGLRenderGame() override = default;
 
 	void RenderGame(const GameField& gameField) override {
-		std::vector<Vertex> testVertices{
-			Vertex(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), glm::vec4(0.0f, 0.0f, 1.0f, 0.0f), glm::vec4(1.0f, 0.0f, 0.0f, 0.0f)),
-			Vertex(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), glm::vec4(0.0f, 0.0f, 1.0f, 0.0f), glm::vec4(1.0f, 0.0f, 0.0f, 0.0f)),
-			Vertex(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), glm::vec4(0.0f, 0.0f, 1.0f, 0.0f), glm::vec4(1.0f, 0.0f, 0.0f, 0.0f)),
-			Vertex(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f), glm::vec4(0.0f, 0.0f, 1.0f, 0.0f), glm::vec4(1.0f, 0.0f, 0.0f, 0.0f)),
-			Vertex(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f), glm::vec4(0.0f, 0.0f, 1.0f, 0.0f), glm::vec4(1.0f, 0.0f, 0.0f, 0.0f)),
-			Vertex(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), glm::vec4(0.0f, 0.0f, 1.0f, 0.0f), glm::vec4(1.0f, 0.0f, 0.0f, 0.0f)),
+		float offset = 10.f;
+		float zIndex = 1.0f;
+
+		const float stepX = (this->window_->GetWidth() - 2.0f * offset) / gameField.GetArray().ColsCount();
+		const float stepY = (this->window_->GetHeight() - 2.0f * offset) / gameField.GetArray().RowsCount();
+
+		// GENERATE LINES
+		std::vector<Vertex> lineVertices{
+			 //TOP — LINE
+			Vertex(
+				glm::vec4(offset, offset, zIndex, 1.0f),
+				glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
+				glm::vec4(0.0f, 0.0f, 0.0f, 0.0f)
+			),
+			Vertex(
+				glm::vec4(this->window_->GetWidth() - offset, offset, zIndex, 1.0f),
+				glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
+				glm::vec4(0.0f, 0.0f, 0.0f, 0.0f)
+			),
+			// LEFT | LINE
+			Vertex(
+				glm::vec4(offset, offset, zIndex, 1.0f),
+				glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
+				glm::vec4(0.0f, 0.0f, 0.0f, 0.0f)
+			),
+			Vertex(
+				glm::vec4(offset, this->window_->GetHeight() - offset, zIndex, 1.0f),
+				glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
+				glm::vec4(0.0f, 0.0f, 0.0f, 0.0f)
+			),
+			// RIGHT | LINE
+			Vertex(
+				glm::vec4(this->window_->GetWidth() - offset, offset, zIndex, 1.0f),
+				glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
+				glm::vec4(0.0f, 0.0f, 0.0f, 0.0f)
+			),
+			Vertex(
+				glm::vec4(this->window_->GetWidth() - offset, this->window_->GetHeight() - offset, zIndex, 1.0f),
+				glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
+				glm::vec4(0.0f, 0.0f, 0.0f, 0.0f)
+			),
+			// BOTTOM — LINE
+			Vertex(
+				glm::vec4(offset, this->window_->GetHeight() - offset, zIndex, 1.0f),
+				glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
+				glm::vec4(0.0f, 0.0f, 0.0f, 0.0f)
+			),
+			Vertex(
+				glm::vec4(this->window_->GetWidth() - offset, this->window_->GetHeight() - offset, zIndex, 1.0f),
+				glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
+				glm::vec4(0.0f, 0.0f, 0.0f, 0.0f)
+			),
 		};
+
+		for (size_t i = 1u; i <= gameField.GetArray().ColsCount(); ++i) {
+			lineVertices.emplace_back(
+				glm::vec4(offset + i * stepX, offset, zIndex, 1.0f),
+				glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
+				glm::vec4(0.0f, 0.0f, 0.0f, 0.0f)
+			);
+			lineVertices.emplace_back(
+				glm::vec4(offset + i * stepX, this->window_->GetHeight() - offset, zIndex, 1.0f),
+				glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
+				glm::vec4(0.0f, 0.0f, 0.0f, 0.0f)
+			);
+		}
+
+		for (size_t i = 1u; i <= gameField.GetArray().RowsCount(); ++i) {
+			lineVertices.emplace_back(
+				glm::vec4(offset, offset + i * stepY, zIndex, 1.0f),
+				glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
+				glm::vec4(0.0f, 0.0f, 0.0f, 0.0f)
+			);
+			lineVertices.emplace_back(
+				glm::vec4(this->window_->GetWidth() - offset, offset + i * stepY, zIndex, 1.0f),
+				glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
+				glm::vec4(0.0f, 0.0f, 0.0f, 0.0f)
+			);
+		}
+
+		// GENERATE MODELS
+		zIndex = 0.0f;
+		std::vector<Vertex> modelVertices;
+
+		for (size_t i = 0u; i < gameField.GetArray().RowsCount(); ++i) {
+			for (size_t j = 0u; j < gameField.GetArray().ColsCount(); ++j) {
+				const glm::vec4 color = gameField.GetArray().Element(i, j) == LIFE_CELL ?
+					glm::vec4(1.0f, 1.0f, 1.0f, 0.0f) :
+					glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+				
+				// TOP LEFT TRIANGLE
+				modelVertices.emplace_back(
+					glm::vec4(offset + j * stepX, offset + i * stepY, zIndex, 1.0f),
+					glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
+					color
+				);
+				modelVertices.emplace_back(
+					glm::vec4(offset + j * stepX, offset + (i + 1) * stepY, zIndex, 1.0f),
+					glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
+					color
+				);
+				modelVertices.emplace_back(
+					glm::vec4(offset + (j + 1) * stepX, offset + i * stepY, zIndex, 1.0f),
+					glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
+					color
+				);
+
+				// BOTTOM RIGHT TRIANGLE
+				modelVertices.emplace_back(
+					glm::vec4(offset + (j + 1) * stepX, offset + i * stepY, zIndex, 1.0f),
+					glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
+					color
+				);
+				modelVertices.emplace_back(
+					glm::vec4(offset + j * stepX, offset + (i + 1) * stepY, zIndex, 1.0f),
+					glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
+					color
+				);
+				modelVertices.emplace_back(
+					glm::vec4(offset + (j + 1) * stepX, offset + (i + 1) * stepY, zIndex, 1.0f),
+					glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
+					color
+				);
+			}
+		}
 
 		this->renderer_->SetViewport(glm::vec2(0.0f, 0.0f), glm::vec2(this->window_->GetWidth(), this->window_->GetHeight()));
 		this->renderer_->ClearDisplay(glm::vec4(0.5f, 0.5f, 0.5f, 0.0f));
-		this->renderer_->RenderLines(testVertices);
+		this->renderer_->RenderTriangles(modelVertices);
+		this->renderer_->RenderLines(lineVertices);
 	}
 
 private:
