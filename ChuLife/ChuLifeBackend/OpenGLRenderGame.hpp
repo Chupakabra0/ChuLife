@@ -104,8 +104,11 @@ class OpenGLWindow {
 public:
 	OpenGLWindow() = delete;
 
-	explicit OpenGLWindow(int width, int height, const std::string& title)
+	explicit OpenGLWindow(int width, int height, const std::string& title, bool isResizable = true)
 		: width_(width), height_(height), title_(title) {
+		glfwWindowHint(GLFW_RESIZABLE, isResizable);
+		//glfwWindowHint(GLFW_SAMPLES, 4);
+
 		this->windowHandle_ = UniqueGLFWWindowPtr(
 			glfwCreateWindow(this->width_, this->height_, this->title_.c_str(), nullptr, nullptr)
 		);
@@ -321,77 +324,80 @@ public:
 		const float stepX = (this->window_->GetWidth() - 2.0f * offset) / gameField.GetArray().ColsCount();
 		const float stepY = (this->window_->GetHeight() - 2.0f * offset) / gameField.GetArray().RowsCount();
 
+		const glm::vec4 lineColor = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+		const glm::vec4 normal    = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
+
 		// GENERATE LINES
 		std::vector<Vertex> lineVertices{
 			 //TOP — LINE
 			Vertex(
 				glm::vec4(offset, offset, zIndex, 1.0f),
 				glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
-				glm::vec4(0.0f, 0.0f, 0.0f, 0.0f)
+				lineColor
 			),
 			Vertex(
 				glm::vec4(this->window_->GetWidth() - offset, offset, zIndex, 1.0f),
-				glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
-				glm::vec4(0.0f, 0.0f, 0.0f, 0.0f)
+				normal,
+				lineColor
 			),
 			// LEFT | LINE
 			Vertex(
 				glm::vec4(offset, offset, zIndex, 1.0f),
-				glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
-				glm::vec4(0.0f, 0.0f, 0.0f, 0.0f)
+				normal,
+				lineColor
 			),
 			Vertex(
 				glm::vec4(offset, this->window_->GetHeight() - offset, zIndex, 1.0f),
-				glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
-				glm::vec4(0.0f, 0.0f, 0.0f, 0.0f)
+				normal,
+				lineColor
 			),
 			// RIGHT | LINE
 			Vertex(
 				glm::vec4(this->window_->GetWidth() - offset, offset, zIndex, 1.0f),
-				glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
-				glm::vec4(0.0f, 0.0f, 0.0f, 0.0f)
+				normal,
+				lineColor
 			),
 			Vertex(
 				glm::vec4(this->window_->GetWidth() - offset, this->window_->GetHeight() - offset, zIndex, 1.0f),
-				glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
-				glm::vec4(0.0f, 0.0f, 0.0f, 0.0f)
+				normal,
+				lineColor
 			),
 			// BOTTOM — LINE
 			Vertex(
 				glm::vec4(offset, this->window_->GetHeight() - offset, zIndex, 1.0f),
-				glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
-				glm::vec4(0.0f, 0.0f, 0.0f, 0.0f)
+				normal,
+				lineColor
 			),
 			Vertex(
 				glm::vec4(this->window_->GetWidth() - offset, this->window_->GetHeight() - offset, zIndex, 1.0f),
-				glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
-				glm::vec4(0.0f, 0.0f, 0.0f, 0.0f)
+				normal,
+				lineColor
 			),
 		};
 
 		for (size_t i = 1u; i <= gameField.GetArray().ColsCount(); ++i) {
 			lineVertices.emplace_back(
 				glm::vec4(offset + i * stepX, offset, zIndex, 1.0f),
-				glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
-				glm::vec4(0.0f, 0.0f, 0.0f, 0.0f)
+				normal,
+				lineColor
 			);
 			lineVertices.emplace_back(
 				glm::vec4(offset + i * stepX, this->window_->GetHeight() - offset, zIndex, 1.0f),
-				glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
-				glm::vec4(0.0f, 0.0f, 0.0f, 0.0f)
+				normal,
+				lineColor
 			);
 		}
 
 		for (size_t i = 1u; i <= gameField.GetArray().RowsCount(); ++i) {
 			lineVertices.emplace_back(
 				glm::vec4(offset, offset + i * stepY, zIndex, 1.0f),
-				glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
-				glm::vec4(0.0f, 0.0f, 0.0f, 0.0f)
+				normal,
+				lineColor
 			);
 			lineVertices.emplace_back(
 				glm::vec4(this->window_->GetWidth() - offset, offset + i * stepY, zIndex, 1.0f),
-				glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
-				glm::vec4(0.0f, 0.0f, 0.0f, 0.0f)
+				normal,
+				lineColor
 			);
 		}
 
@@ -401,42 +407,44 @@ public:
 
 		for (size_t i = 0u; i < gameField.GetArray().RowsCount(); ++i) {
 			for (size_t j = 0u; j < gameField.GetArray().ColsCount(); ++j) {
-				const glm::vec4 color = gameField.GetArray().Element(i, j) == LIFE_CELL ?
+				const glm::vec4 cellColor = gameField.GetArray().Element(i, j) == LIFE_CELL ?
 					glm::vec4(1.0f, 1.0f, 1.0f, 0.0f) :
-					glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+					gameField.GetArray().Element(i, j) == DEAD_CELL ?
+						glm::vec4(0.0f, 0.0f, 0.0f, 0.0f) :
+						glm::vec4(1.0f, 0.0f, 0.0f, 0.0f);
 				
 				// TOP LEFT TRIANGLE
 				modelVertices.emplace_back(
 					glm::vec4(offset + j * stepX, offset + i * stepY, zIndex, 1.0f),
-					glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
-					color
+					normal,
+					cellColor
 				);
 				modelVertices.emplace_back(
 					glm::vec4(offset + j * stepX, offset + (i + 1) * stepY, zIndex, 1.0f),
-					glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
-					color
+					normal,
+					cellColor
 				);
 				modelVertices.emplace_back(
 					glm::vec4(offset + (j + 1) * stepX, offset + i * stepY, zIndex, 1.0f),
-					glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
-					color
+					normal,
+					cellColor
 				);
 
 				// BOTTOM RIGHT TRIANGLE
 				modelVertices.emplace_back(
 					glm::vec4(offset + (j + 1) * stepX, offset + i * stepY, zIndex, 1.0f),
-					glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
-					color
+					normal,
+					cellColor
 				);
 				modelVertices.emplace_back(
 					glm::vec4(offset + j * stepX, offset + (i + 1) * stepY, zIndex, 1.0f),
-					glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
-					color
+					normal,
+					cellColor
 				);
 				modelVertices.emplace_back(
 					glm::vec4(offset + (j + 1) * stepX, offset + (i + 1) * stepY, zIndex, 1.0f),
-					glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
-					color
+					normal,
+					cellColor
 				);
 			}
 		}
@@ -444,7 +452,12 @@ public:
 		this->renderer_->SetViewport(glm::vec2(0.0f, 0.0f), glm::vec2(this->window_->GetWidth(), this->window_->GetHeight()));
 		this->renderer_->ClearDisplay(glm::vec4(0.5f, 0.5f, 0.5f, 0.0f));
 		this->renderer_->RenderTriangles(modelVertices);
-		this->renderer_->RenderLines(lineVertices);
+
+		{
+			glLineWidth(std::abs(modelVertices[0].GetPosition().y - modelVertices[1].GetPosition().y) / 15.0f);
+			this->renderer_->RenderLines(lineVertices);
+			glLineWidth(1);
+		}
 	}
 
 private:

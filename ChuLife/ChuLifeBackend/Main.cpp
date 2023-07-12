@@ -1,6 +1,5 @@
 #include <iostream>
 #include <memory>
-#include <thread>
 #include <chrono>
 
 #include "GameField.hpp"
@@ -8,6 +7,8 @@
 #include "BasicRule.hpp"
 #include "ConsoleRenderGame.hpp"
 #include "OpenGLRenderGame.hpp"
+
+#include <glm/gtx/string_cast.hpp>
 
 int main() {
 	//GameField gameField(Array2D<char>{
@@ -31,25 +32,29 @@ int main() {
 
 	const size_t lifeLimit = 5u;
 	const size_t deadLimit = 3u;
-	const int windowHeight = 1080;
-	const int windowWidth  = 1920;
+	const int windowHeight = 720;
+	const int windowWidth  = 1280;
 
 	auto* renderer = new OpenGLRenderer();
 	auto* window   = new OpenGLWindow(windowWidth, windowHeight, "Test");
 
-	renderer->SetViewMatrix(
-		glm::mat4(
-			2.0f / windowWidth, 0.0f, 0.0f, 0.0f,
-			0.0f, -2.0f / windowHeight, 0.0f, 0.0f,
-			0.0f, 0.0f, 1.0f, 0.0f,
-			-1.0f, 1.0f, 0.0f, 1.0f
-		)
-	);
+	//renderer->SetViewMatrix(
+	//	glm::mat4(
+	//		2.0f / windowWidth, 0.0f, 0.0f, 0.0f,
+	//		0.0f, -2.0f / windowHeight, 0.0f, 0.0f,
+	//		0.0f, 0.0f, 1.0f, 0.0f,
+	//		-1.0f, 1.0f, 0.0f, 1.0f
+	//	)
+	//);
+
+	renderer->SetProjectionMatrix(glm::ortho(0.0f, static_cast<float>(windowWidth), static_cast<float>(windowHeight), 0.0f));
+
+	std::cout << glm::to_string(renderer->GetViewMatrix()) << std::endl;
 
 	std::unique_ptr<ILifeRule> gameRule(new BasicRule(lifeLimit, deadLimit));
 	std::unique_ptr<IRenderGame> renderGame(new OpenGLRenderGame(window, renderer));
 
-	const std::time_t milisecondsLimit = 100ll;
+	const std::time_t milisecondsLimit = 16ll;
 	auto begin                         = std::chrono::system_clock::now();
 	auto end                           = std::chrono::system_clock::now();
 
