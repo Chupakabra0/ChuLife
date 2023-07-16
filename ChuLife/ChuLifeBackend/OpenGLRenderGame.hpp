@@ -92,10 +92,10 @@ public:
 };
 
 struct DestroyGLFWWindow {
+public:
     void operator()(GLFWwindow* ptr) {
         glfwDestroyWindow(ptr);
     }
-
 };
 
 using UniqueGLFWWindowPtr = std::unique_ptr<GLFWwindow, DestroyGLFWWindow>;
@@ -164,8 +164,28 @@ public:
         this->title_ = title;
     }
 
-    const UniqueGLFWWindowPtr& GetUniqueHandle() const {
+    UniqueGLFWWindowPtr& GetUniqueHandle() {
         return this->windowHandle_;
+    }
+
+    GLFWwindow* GetHandle() {
+        return this->GetUniqueHandle().get();
+    }
+
+    bool WindowShouldClose() {
+        return glfwWindowShouldClose(this->GetHandle());
+    }
+
+    void SwapBuffers() {
+        glfwSwapBuffers(this->GetHandle());
+    }
+
+    void PollEvents() {
+        glfwPollEvents();
+    }
+
+    void WaitEvents() {
+        glfwWaitEvents();
     }
 
 private:

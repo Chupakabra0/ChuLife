@@ -8,26 +8,7 @@
 #include "ConsoleRenderGame.hpp"
 #include "OpenGLRenderGame.hpp"
 
-#include <glm/gtx/string_cast.hpp>
-
 int main() {
-    //GameField gameField(Array2D<char>{
-    //	std::initializer_list{
-    //		DEAD_CELL, DEAD_CELL, DEAD_CELL, DEAD_CELL, DEAD_CELL
-    //	},
-    //	{
-    //		DEAD_CELL, LIFE_CELL, DEAD_CELL, LIFE_CELL, DEAD_CELL
-    //	},
-    //	{
-    //		DEAD_CELL, LIFE_CELL, DEAD_CELL, DEAD_CELL, DEAD_CELL
-    //	},
-    //	{
-    //		DEAD_CELL, LIFE_CELL, DEAD_CELL, LIFE_CELL, DEAD_CELL
-    //	},
-    //	{
-    //		DEAD_CELL, DEAD_CELL, DEAD_CELL, DEAD_CELL, DEAD_CELL
-    //	}
-    //});
     GameField gameField(72, 128, new RandomFillStrategy());
 
     const size_t lifeLimit = 5u;
@@ -46,10 +27,7 @@ int main() {
     //		-1.0f, 1.0f, 0.0f, 1.0f
     //	)
     //);
-
     renderer->SetProjectionMatrix(glm::ortho(0.0f, static_cast<float>(windowWidth), static_cast<float>(windowHeight), 0.0f));
-
-    std::cout << glm::to_string(renderer->GetViewMatrix()) << std::endl;
 
     std::unique_ptr<ILifeRule> gameRule(new BasicRule(lifeLimit, deadLimit));
     std::unique_ptr<IRenderGame> renderGame(new OpenGLRenderGame(window, renderer));
@@ -58,28 +36,20 @@ int main() {
     auto begin                         = std::chrono::system_clock::now();
     auto end                           = std::chrono::system_clock::now();
 
-    while (!glfwWindowShouldClose(window->GetUniqueHandle().get())) {
+    while (!window->WindowShouldClose()) {
         end = std::chrono::system_clock::now();
 
         if (std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() > milisecondsLimit) {
             renderGame->RenderGame(gameField);
             gameField.NextField(gameRule.get());
 
-            glfwSwapBuffers(window->GetUniqueHandle().get());
+            window->SwapBuffers();
 
             begin = std::chrono::system_clock::now();
         }
 
-        glfwPollEvents();
+        window->PollEvents();
     }
-
-    //std::unique_ptr<IRenderGame> renderGame(new ConsoleRenderGame(std::cout));
-
-    //for (int i = 0; i < 10; ++i) {
-    //	std::cout << i + 1 << " iteration\n";
-    //	renderGame->RenderGame(gameField);
-    //	gameField.NextField(gameRule.get());
-    //}
 
     return EXIT_SUCCESS;
 }
