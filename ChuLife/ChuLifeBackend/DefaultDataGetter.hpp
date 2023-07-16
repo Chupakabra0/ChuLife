@@ -5,7 +5,6 @@ class DefaultDataGetter : public IDataGetter {
 public:
     ~DefaultDataGetter() override = default;
 
-private:
     virtual size_t GetLifeLimit() override;
     virtual size_t GetDeadLimit() override;
 
