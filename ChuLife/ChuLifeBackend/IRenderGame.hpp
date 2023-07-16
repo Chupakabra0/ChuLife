@@ -3,6 +3,6 @@
 
 struct IRenderGame {
 public:
-	virtual ~IRenderGame()								  = default;
-	virtual void RenderGame(const GameField& gameField)   = 0;
+    virtual ~IRenderGame()								  = default;
+    virtual void RenderGame(const GameField& gameField)   = 0;
 };

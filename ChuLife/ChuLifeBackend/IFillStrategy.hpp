@@ -3,6 +3,6 @@
 
 struct IFillStrategy {
 public:
-	virtual ~IFillStrategy()                     = default;
-	virtual void FillField(Array2D<char>& field) = 0;
+    virtual ~IFillStrategy()                     = default;
+    virtual void FillField(Array2D<char>& field) = 0;
 };

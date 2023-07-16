@@ -7,12 +7,12 @@
 
 class RandomFillStrategy : public IFillStrategy {
 public:
-	explicit RandomFillStrategy() = default;
+    explicit RandomFillStrategy() = default;
 
-	~RandomFillStrategy() override = default;
+    ~RandomFillStrategy() override = default;
 
-	void FillField(Array2D<char>& field) override;
+    void FillField(Array2D<char>& field) override;
 
 private:
-	char GeneratNextChar_();
+    char GeneratNextChar_();
 };
