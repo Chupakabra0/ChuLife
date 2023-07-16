@@ -7,6 +7,7 @@
 #include "BasicRule.hpp"
 #include "ConsoleRenderGame.hpp"
 #include "OpenGLRenderGame.hpp"
+#include "Timer.hpp"
 
 int main() {
     GameField gameField(72, 128, new RandomFillStrategy());
@@ -15,6 +16,9 @@ int main() {
     const size_t deadLimit = 3u;
     const int windowHeight = 720;
     const int windowWidth  = 1280;
+
+    auto renderTimer     = std::make_unique<Timer>();
+    auto fpsCounterTimer = std::make_unique<Timer>();
 
     auto* renderer = new OpenGLRenderer();
     auto* window   = new OpenGLWindow(windowWidth, windowHeight, "Test");
@@ -32,20 +36,31 @@ int main() {
     std::unique_ptr<ILifeRule> gameRule(new BasicRule(lifeLimit, deadLimit));
     std::unique_ptr<IRenderGame> renderGame(new OpenGLRenderGame(window, renderer));
 
-    const std::time_t milisecondsLimit = 16ll;
-    auto begin                         = std::chrono::system_clock::now();
-    auto end                           = std::chrono::system_clock::now();
+    const std::time_t milisecondsLimit = 12ll;
+    const double framesPerSecond       = 1000.0 / static_cast<double>(milisecondsLimit);
+    
+    long long framesCount = 0ll;
+
+    std::cout << "Theoretical FPS: " << framesPerSecond << std::endl;
 
     while (!window->WindowShouldClose()) {
-        end = std::chrono::system_clock::now();
+        renderTimer->FixEndTime();
+        fpsCounterTimer->FixEndTime();
 
-        if (std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() > milisecondsLimit) {
+        if (renderTimer->GetDurationCount<std::chrono::milliseconds>() >= milisecondsLimit) {
             renderGame->RenderGame(gameField);
             gameField.NextField(gameRule.get());
 
             window->SwapBuffers();
+            ++framesCount;
 
-            begin = std::chrono::system_clock::now();
+            renderTimer->FixBeginTime();
+        }
+        if (fpsCounterTimer->GetDurationCount<std::chrono::seconds>() >= 1ll) {
+            std::cout << "FPS: " << framesCount << std::endl;
+
+            framesCount = 0ll;
+            fpsCounterTimer->FixBeginTime();
         }
 
         window->PollEvents();

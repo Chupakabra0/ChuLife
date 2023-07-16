@@ -105,6 +105,7 @@
     <ClInclude Include="Khrplatform.hpp" />
     <ClInclude Include="OpenGLRenderGame.hpp" />
     <ClInclude Include="RandomFillStrategy.hpp" />
+    <ClInclude Include="Timer.hpp" />
     <ClInclude Include="Utils.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
