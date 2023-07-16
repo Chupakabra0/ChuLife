@@ -453,11 +453,13 @@ public:
         this->renderer_->ClearDisplay(glm::vec4(0.5f, 0.5f, 0.5f, 0.0f));
         this->renderer_->RenderTriangles(modelVertices);
 
-        {
-            glLineWidth(std::abs(modelVertices[0].GetPosition().y - modelVertices[1].GetPosition().y) / 15.0f);
-            this->renderer_->RenderLines(lineVertices);
-            glLineWidth(1);
-        }
+        constexpr float widthCoeff = 15.0f;
+        const float horzontalWidth = std::abs(modelVertices[1].GetPosition().x - modelVertices[2].GetPosition().x) / widthCoeff;
+        const float verticalWidth  = std::abs(modelVertices[0].GetPosition().y - modelVertices[1].GetPosition().y) / widthCoeff;
+
+        glLineWidth(std::min(horzontalWidth, verticalWidth));
+        this->renderer_->RenderLines(lineVertices);
+        glLineWidth(1.0f);
     }
 
 private:
