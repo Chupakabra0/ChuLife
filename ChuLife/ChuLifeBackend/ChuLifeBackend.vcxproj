@@ -44,11 +44,11 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)ThirdParty\glm;$(SolutionDir)ThirdParty\glfw\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)ThirdParty\glm;$(SolutionDir)ThirdParty\argparse;$(SolutionDir)ThirdParty\glfw\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)ThirdParty\glfw\lib-vc2022;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir)ThirdParty\glm;$(SolutionDir)ThirdParty\glfw\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)ThirdParty\glm;$(SolutionDir)ThirdParty\argparse;$(SolutionDir)ThirdParty\glfw\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)ThirdParty\glfw\lib-vc2022;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -86,6 +86,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ArgsDataGetter.cpp" />
     <ClCompile Include="BasicRule.cpp" />
     <ClCompile Include="DefaultDataGetter.cpp" />
     <ClCompile Include="GameField.cpp" />
@@ -94,6 +95,7 @@
     <ClCompile Include="RandomFillStrategy.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ArgsDataGetter.hpp" />
     <ClInclude Include="Array2D.hpp" />
     <ClInclude Include="BasicRule.hpp" />
     <ClInclude Include="ConsoleRenderGame.hpp" />

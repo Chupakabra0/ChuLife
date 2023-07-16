@@ -2,11 +2,11 @@
 #include "Consts.hpp"
 
 size_t DefaultDataGetter::GetLifeLimit() {
-    return static_cast<size_t>(DEFAULT_LIFE_LIMIT);
+    return DEFAULT_LIFE_LIMIT;
 }
 
 size_t DefaultDataGetter::GetDeadLimit() {
-    return static_cast<size_t>(DEFAULT_DEAD_LIMIT);
+    return DEFAULT_DEAD_LIMIT;
 }
 
 int DefaultDataGetter::GetWindowHeight() {

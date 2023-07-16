@@ -229,10 +229,7 @@ public:
             .viewMatrix       = glm::identity<glm::mat4>(),
             .projectionMatrix = glm::identity<glm::mat4>(),
         }) {
-        this->glfwInit_();
-        //this->SetModelMatrix(mvp.modelMatrix);
-        //this->SetProjectionMatrix(mvp.projectionMatrix);
-        //this->SetViewMatrix(mvp.viewMatrix);
+        this->GLFWInit_();
     }
 
     ~OpenGLRenderer() {
@@ -245,7 +242,8 @@ public:
     }
 
     void SetViewport(const glm::vec2& viewportStart, const glm::vec2& viewportSize) {
-        glViewport(viewportStart.x, viewportStart.y, viewportSize.x, viewportSize.y);
+        glViewport(static_cast<GLint>(viewportStart.x), static_cast<GLint>(viewportStart.y),
+            static_cast<GLint>(viewportSize.x), static_cast<GLint>(viewportSize.y));
     }
 
     const glm::mat4& GetModelMatrix() const {
@@ -315,7 +313,7 @@ public:
 private:
     MVPMatrices mvp_;
 
-    void glfwInit_() {
+    void GLFWInit_() {
         if (!glfwInit()) {
             throw std::runtime_error("Initializing GLFW error");
         }
@@ -473,11 +471,11 @@ public:
         this->renderer_->ClearDisplay(glm::vec4(0.5f, 0.5f, 0.5f, 0.0f));
         this->renderer_->RenderTriangles(modelVertices);
 
-        constexpr float widthCoeff = 15.0f;
-        const float horzontalWidth = std::abs(modelVertices[1].GetPosition().x - modelVertices[2].GetPosition().x) / widthCoeff;
-        const float verticalWidth  = std::abs(modelVertices[0].GetPosition().y - modelVertices[1].GetPosition().y) / widthCoeff;
+        constexpr float widthCoeff  = 15.0f;
+        const float horizontalWidth = std::abs(modelVertices[0].GetPosition().x - modelVertices[2].GetPosition().x) / widthCoeff;
+        const float verticalWidth   = std::abs(modelVertices[0].GetPosition().y - modelVertices[1].GetPosition().y) / widthCoeff;
 
-        glLineWidth(std::min(horzontalWidth, verticalWidth));
+        glLineWidth(std::min(horizontalWidth, verticalWidth));
         this->renderer_->RenderLines(lineVertices);
         glLineWidth(1.0f);
     }
