@@ -87,6 +87,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="BasicRule.cpp" />
+    <ClCompile Include="DefaultDataGetter.cpp" />
     <ClCompile Include="GameField.cpp" />
     <ClCompile Include="Glad.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -97,8 +98,10 @@
     <ClInclude Include="BasicRule.hpp" />
     <ClInclude Include="ConsoleRenderGame.hpp" />
     <ClInclude Include="Consts.hpp" />
+    <ClInclude Include="DefaultDataGetter.hpp" />
     <ClInclude Include="GameField.hpp" />
     <ClInclude Include="Glad.hpp" />
+    <ClInclude Include="IDataGetter.hpp" />
     <ClInclude Include="IFillStrategy.hpp" />
     <ClInclude Include="ILifeRule.hpp" />
     <ClInclude Include="IRenderGame.hpp" />
